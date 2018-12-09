@@ -10,5 +10,12 @@
 #define variable_h
 
 #include <stdio.h>
+#include "library.h"
+
+
+void searchUseVariable(RulesElement *rulesParam, char *data, int index);
+void eraseNoGlobalVariable(RulesElement *rulesParam);
+void addVariable(RulesElement *rulesParam, char *var, int line, int global);
+void findVariable(char *data, RulesElement *rulesParam, int line, int global);
 
 #endif /* variable_h */

@@ -10,5 +10,9 @@
 #define prototypeAndFunction_h
 
 #include <stdio.h>
+#include "library.h"
+
+void findPrototype(char *type, RulesElement *rulesParam, char *data, int line);
+void findFunction(char *type, RulesElement *rulesParam, char *data, int line);
 
 #endif /* prototypeAndFunction_h */

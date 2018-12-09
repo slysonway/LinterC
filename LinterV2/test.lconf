@@ -1,0 +1,8 @@
+=rules
+- array-bracket-eol = on
+- operators-spacing = on
+- variable-assignment-type = on
+
+=excludedFiles
+- CMakeCCompilerId.c
+- linter.c

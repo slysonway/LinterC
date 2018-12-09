@@ -1,0 +1,12 @@
+=extends
+test.lconf
+
+=rules
+- array-bracket-eol = off
+- operators-spacing = on
+- array-bracket-eol = on
+- indent =    4
+
+=excludedFiles
+- test.c
+- feature_tests.c
