@@ -18,10 +18,10 @@ void readAllDirectory(char *filename, int recursive, ConfElement *param)
     struct dirent *directoryInfo;
     int find = 0;
     LinkedList *i;
-
+    
     // Start, by opening the directory
     dir = opendir(filename);
-
+    
     // If the directory have been correctly open
     if(dir)
     {
@@ -35,7 +35,7 @@ void readAllDirectory(char *filename, int recursive, ConfElement *param)
                 if((temp = strrchr(directoryInfo->d_name, '.')) != NULL && strcmp(temp  + 1, "c") == 0)
                 {
                     find = 0;
-
+                    
                     // Then check if this file is not in excluded file list
                     for(i = param->excludedFiles; i != NULL; i = i->next)
                     {
@@ -45,7 +45,7 @@ void readAllDirectory(char *filename, int recursive, ConfElement *param)
                             break;
                         }
                     }
-
+                    
                     // If the file is not in excluded file
                     if(find == 0)
                     {
@@ -53,7 +53,7 @@ void readAllDirectory(char *filename, int recursive, ConfElement *param)
                         strcpy(buffer, filename);
                         strcat(buffer, "/");
                         strcat(buffer, directoryInfo->d_name);
-
+                        
                         // And inspect the file
                         exploreFile(buffer, param);
                     }
@@ -67,13 +67,13 @@ void readAllDirectory(char *filename, int recursive, ConfElement *param)
                 strcpy(buffer, filename);
                 strcat(buffer, "/");
                 strcat(buffer, directoryInfo->d_name);
-
+                
                 // Restart the same function
                 // On new directory
                 readAllDirectory(buffer, recursive, param);
             }
         }
-
+        
         // At the end close the directory
         closedir(dir);
     }
@@ -93,9 +93,28 @@ void exploreFile(char * fileName, ConfElement *param)
     int error = 0;
     char errorMessage[600] = {'\0'};
     int fileError = 0;
-
+    int temp;
+    int allLine = 0;
+    
+    // Set the cursor to the start
+    fseek(f, 0, SEEK_SET);
+    
+    // We count the number of line
+    while(!feof(f))
+    {
+        temp = fgetc(f);
+        
+        if(temp == '\n')
+        {
+            allLine++;
+        }
+    }
+    
+    // Set the cursor to the start
+    fseek(f, 0, SEEK_SET);
+    
     printf("Fichier %s:\n", fileName);
-
+    
     // If the file have been correctly open
     if(f != NULL)
     {
@@ -103,33 +122,29 @@ void exploreFile(char * fileName, ConfElement *param)
         while(fgets(buffer, 2000, f) != NULL)
         {
             error = 0;
-
+            
             for(LinkedList *i = param->rules; i != NULL; i = i->next)
             {
-                //buffer[strlen(buffer)] = '\0';
-
-                ((RulesElement *)i->data)->initFunction(line, buffer, ((RulesElement *)i->data), &error, errorMessage);
-                if (line > 110) {
-                }
+                ((RulesElement *)i->data)->initFunction(line, buffer, ((RulesElement *)i->data), line == allLine, &error, errorMessage);
             }
-
+            
             if(error != 0)
             {
                 printf("    Line n°%d:\n", line);
                 printf("%s", errorMessage);
-
+                
                 fileError = 1;
-
+                
                 strcpy(errorMessage, "");
             }
-
+            
             line++;
         }
     }
-
+    
     if(fileError == 0)
-
+        
         printf("    No error found\n");
-
+    
     printf("\n");
 }

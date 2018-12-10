@@ -17,7 +17,7 @@ typedef struct ConfElement
 
 typedef struct RulesElement
 {
-    void (*initFunction)(int line, char *data, struct RulesElement *rulesParam, int *error, char *errorMessage);
+    void (*initFunction)(int line, char *data, struct RulesElement *rulesParam, int isEnd, int *error, char *errorMessage);
     void *baseData;
     int temp;
     char rulesName[100];

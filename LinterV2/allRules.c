@@ -4,12 +4,12 @@
 
 #include "allRules.h"
 
-void arrayBracketEol(int line, char *data, RulesElement *rulesParam, int *error, char *errorMessage)
+void arrayBracketEol(int line, char *data, RulesElement *rulesParam, int isEnd, int *error, char *errorMessage)
 {
     //puts("EOL");
 }
 
-void operatorsSpacing(int line, char *data, RulesElement *rulesParam, int *error, char *errorMessage)
+void operatorsSpacing(int line, char *data, RulesElement *rulesParam, int isEnd, int *error, char *errorMessage)
 {
     size_t length = strlen(data);
     char allOperator[] = {'=', '+', '-', '/', '*', '&', '|'};
@@ -37,7 +37,7 @@ void operatorsSpacing(int line, char *data, RulesElement *rulesParam, int *error
     }
 }
 
-void indent(int line, char *currentLine, RulesElement *rulesParam, int *error, char *errorMessage){
+void indent(int line, char *data, RulesElement *rulesParam, int isEnd, int *error, char *errorMessage){
 
     //printf("%d \n", rulesParam->number);
     
@@ -45,7 +45,7 @@ void indent(int line, char *currentLine, RulesElement *rulesParam, int *error, c
 
 
 
-void noMultiDeclaration(int line, char *data, RulesElement *rulesParam, int *error, char *errorMessage) {
+void noMultiDeclaration(int line, char *data, RulesElement *rulesParam, int isEnd, int *error, char *errorMessage) {
     //printf("%s", data);
     char *type[] = {"char", "short int", "short", "int", "long int", "long", "long long int", "long long", "float", "double", "long double", "struct"};
     int i;
@@ -62,7 +62,7 @@ void noMultiDeclaration(int line, char *data, RulesElement *rulesParam, int *err
 
 //TODO Check global variable
 //check unusedVariable in c file
-void unusedVariable(int line, char *data, RulesElement *rulesParam, int *error, char *errorMessage) {
+void unusedVariable(int line, char *data, RulesElement *rulesParam, int isEnd, int *error, char *errorMessage) {
     char *type[] = {"char", "short int", "short", "int", "long int", "long", "long long int", "long long", "float", "double", "long double", "void"};
     int i;
     int j;
@@ -136,7 +136,7 @@ void unusedVariable(int line, char *data, RulesElement *rulesParam, int *error, 
             if (((BaseData *)rulesParam->baseData)->variableSize > 0) {
                 for (j = 0; j < ((BaseData *)rulesParam->baseData)->variableSize; j++) {
                     if (((BaseData *)rulesParam->baseData)->variable[j].global != 1 && ((BaseData *)rulesParam->baseData)->variable[j].use != 1) {
-                        sprintf(errorBuffer, "        The rule unused variable is not respected at line: %d\n", ((BaseData *)rulesParam->baseData)->variable[j].line);
+                        sprintf(errorBuffer, "\t\tThe rule unused variable is not respected at line: %d\n", ((BaseData *)rulesParam->baseData)->variable[j].line);
                         strcat(errorMessage, errorBuffer);
                         *error = 1;
                     }
@@ -162,15 +162,34 @@ void unusedVariable(int line, char *data, RulesElement *rulesParam, int *error, 
                 }
             }
         }
+        
+        if (isEnd) {
+            for (i = 0; i < ((BaseData *)rulesParam->baseData)->variableSize; i++) {
+                if (((BaseData *)rulesParam->baseData)->variable[i].use < 1) {
+                    sprintf(errorBuffer, "\t\tThe rule unused variable is not respected at line: %d\n", ((BaseData *)rulesParam->baseData)->variable[i].line);
+                    strcat(errorMessage, errorBuffer);
+                    *error = 1;
+                }
+                free(((BaseData *)rulesParam->baseData)->variable[i].name);
+            }
+            free(((BaseData *)rulesParam->baseData)->variable);
+            
+            for (i = 0; i < ((BaseData *)rulesParam->baseData)->otherTypeSize; i++) {
+                free(((BaseData *)rulesParam->baseData)->otherType[i]);
+            }
+            free(((BaseData *)rulesParam->baseData)->otherType);
+            
+            free((BaseData *)rulesParam->baseData);
+        }
     }
 }
 
 
-void undeclaredVariable(int line, char *data, RulesElement *rulesParam, int *error, char *errorMessage) {
+void undeclaredVariable(int line, char *data, RulesElement *rulesParam, int isEnd, int *error, char *errorMessage) {
     
 }
 
-void noPrototype(int line, char *data, RulesElement *rulesParam, int *error, char *errorMessage) {
+void noPrototype(int line, char *data, RulesElement *rulesParam, int isEnd, int *error, char *errorMessage) {
     char *type[] = {"char", "short int", "short", "int", "long int", "long", "long long int", "long long", "float", "double", "long double", "void"};
     int i;
     int j;
@@ -267,15 +286,30 @@ void noPrototype(int line, char *data, RulesElement *rulesParam, int *error, cha
             }
         }
         
+        if (isEnd) {
+            for (i = 0; i < ((BaseData *)rulesParam->baseData)->variableSize; i++) {
+                free(((BaseData *)rulesParam->baseData)->variable[i].name);
+            }
+            free(((BaseData *)rulesParam->baseData)->variable);
+            
+            for (i = 0; i < ((BaseData *)rulesParam->baseData)->otherTypeSize; i++) {
+                free(((BaseData *)rulesParam->baseData)->otherType[i]);
+            }
+            free(((BaseData *)rulesParam->baseData)->otherType);
+            
+            free((BaseData *)rulesParam->baseData);
+            free(tmp);
+        }
+        
     }
 }
 
 //TODO check not use at end of file
-void unusedFunction(int line, char *data, RulesElement *rulesParam, int *error, char *errorMessage) {
+void unusedFunction(int line, char *data, RulesElement *rulesParam, int isEnd, int *error, char *errorMessage) {
     char *type[] = {"char", "short int", "short", "int", "long int", "long", "long long int", "long long", "float", "double", "long double", "void"};
     int i;
     int typeSize = 12;
-    char *tmp;
+    char errorBuffer[255];
     
     
     //init needed variable
@@ -312,11 +346,30 @@ void unusedFunction(int line, char *data, RulesElement *rulesParam, int *error, 
             if (strstr(data, ((BaseData *)rulesParam->baseData)->variable[i].name) && ((BaseData *)rulesParam->baseData)->variable[i].line != line && strchr(data, '(')) {
                 ((BaseData *)rulesParam->baseData)->variable[i].use = 1;
             }
-        }  
+        }
+        
+        if (isEnd) {
+            for (i = 0; i < ((BaseData *)rulesParam->baseData)->variableSize; i++) {
+                if (((BaseData *)rulesParam->baseData)->variable[i].use < 1) {
+                    sprintf(errorBuffer, "\t\tThe rule unused function is not respected at line: %d\n", ((BaseData *)rulesParam->baseData)->variable[i].line);
+                    strcat(errorMessage, errorBuffer);
+                    *error = 1;
+                }
+                free(((BaseData *)rulesParam->baseData)->variable[i].name);
+            }
+            free(((BaseData *)rulesParam->baseData)->variable);
+            
+            for (i = 0; i < ((BaseData *)rulesParam->baseData)->otherTypeSize; i++) {
+                free(((BaseData *)rulesParam->baseData)->otherType[i]);
+            }
+            free(((BaseData *)rulesParam->baseData)->otherType);
+            
+            free((BaseData *)rulesParam->baseData);
+        }
     }
 }
 
-void variableAssignmentType(int line, char *data, RulesElement *rulesParam, int *error, char *errorMessage)
+void variableAssignmentType(int line, char *data, RulesElement *rulesParam, int isEnd, int *error, char *errorMessage)
 {
     char *integerType[]     =   {"char", "short int", "short", "int", "long int", "long", "long long int", "long long"};
     char *intergerOption[]  =   {"signed", "unsigned", ""};

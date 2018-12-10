@@ -29,22 +29,22 @@ typedef struct BaseData
     Variable* variable;
 } BaseData;
 
-void arrayBracketEol(int line, char *data, RulesElement *rulesParam, int *error, char *errorMessage);
+void arrayBracketEol(int line, char *data, RulesElement *rulesParam, int isEnd, int *error, char *errorMessage);
 
-void operatorsSpacing(int line, char *data, RulesElement *rulesParam, int *error, char *errorMessage);
+void operatorsSpacing(int line, char *data, RulesElement *rulesParam, int isEnd, int *error, char *errorMessage);
 
-void indent(int line, char *currentLine, RulesElement *rulesParam, int *error, char *errorMessage);
+void indent(int line, char *data, RulesElement *rulesParam, int isEnd, int *error, char *errorMessage);
 
-void noMultiDeclaration(int line, char *data, RulesElement *rulesParam, int *error, char *errorMessage);
+void noMultiDeclaration(int line, char *data, RulesElement *rulesParam, int isEnd, int *error, char *errorMessage);
 
-void unusedVariable(int line, char *data, RulesElement *rulesParam, int *error, char *errorMessage);
+void unusedVariable(int line, char *data, RulesElement *rulesParam, int isEnd, int *error, char *errorMessage);
 
-void undeclaredVariable(int line, char *data, RulesElement *rulesParam, int *error, char *errorMessage);
+void undeclaredVariable(int line, char *data, RulesElement *rulesParam, int isEnd, int *error, char *errorMessage);
 
-void noPrototype(int line, char *data, RulesElement *rulesParam, int *error, char *errorMessage);
+void noPrototype(int line, char *data, RulesElement *rulesParam, int isEnd, int *error, char *errorMessage);
 
-void unusedFunction(int line, char *data, RulesElement *rulesParam, int *error, char *errorMessage);
+void unusedFunction(int line, char *data, RulesElement *rulesParam, int isEnd, int *error, char *errorMessage);
 
-void variableAssignmentType(int line, char *data, RulesElement *rulesParam, int *error, char *errorMessage);
+void variableAssignmentType(int line, char *data, RulesElement *rulesParam, int isEnd, int *error, char *errorMessage);
 
 #endif //LINTERPROJECT_ALLRULES_H

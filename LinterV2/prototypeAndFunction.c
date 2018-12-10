@@ -19,6 +19,8 @@ void findPrototype(char *type, RulesElement *rulesParam, char *data, int line) {
         addVariable(rulesParam, trim(tmp), line, 0);
         }
     }
+
+    free(tmp);
 }
 
 void findFunction(char *type, RulesElement *rulesParam, char *data, int line) {
@@ -37,4 +39,5 @@ void findFunction(char *type, RulesElement *rulesParam, char *data, int line) {
             }
         }
     }
+    free(tmp);
 }
